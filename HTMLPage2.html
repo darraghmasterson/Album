@@ -7,21 +7,24 @@
 </head>
 <body>
     <script src="jquery-3.5.1.js">
-        
-        $(function() {
+
+        var request = new XMLHttpRequest();
+
         var url = window.location.href;
         var access_token = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1];
         console.log(access_token);
-        });
+        
 
-        $.ajax({
-               url: 'https://api.spotify.com/v1/me/albums/contains',
-               headers: {
-                   'Authorization': 'Bearer ' + access_token    
-               },
-               success: function(response) {
-                   console.log(response);
-               }
+
+         request.open("GET", "https://api.spotify.com/v1/me/albums", true);
+         request.setRequestHeader("Authorization", "Bearer "+ access_token);
+         request.send();
+
+         request.onreadystatechange = function () {
+         if (request.readyState == 4 && request_.status == 200) {
+            var response = request.responseText;
+            var obj = JSON.parse(response); 
+        }
     </script>
 </body>
 </html>
