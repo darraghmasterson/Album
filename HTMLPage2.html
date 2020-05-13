@@ -10,7 +10,7 @@
         
         var url = window.location;
 
-        var access_token = new URLSearchParams(url.search).get('access_token');
+        var access_token = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1];
         console.log(access_token);
 
     </script>
