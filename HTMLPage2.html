@@ -6,25 +6,57 @@
     <title></title>
 </head>
 <body>
-    <script src="jquery-3.5.1.js">
+    <img src="https://i.scdn.co/image/ab67616d0000b273a5952c0e2e649f588603b743" />
+    <script >
 
         var request = new XMLHttpRequest();
 
-        var url = window.location.href;
+        var url = "https://darraghmasterson.github.io/Album/HTMLPage2.html#access_token=BQBuQoMxUUwrp4-eL2MbaVIYQHsHmgCAmglBpoEny_RVkg4bJ4YfA2wRAtDaM67sklGrq7o8F0Ufw_e3PG_NeCPOV7Kd3vYmwjY9O8MFyaeML202an_whoIHwPffyQmFmNEXDrTY6xbkexhy3n1qdndC&token_type=Bearer&expires_in=3600";
         var access_token = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1];
         console.log(access_token);
         
 
 
-         request.open("GET", "https://api.spotify.com/v1/me/albums", true);
+         request.open("GET", "https://api.spotify.com/v1/me/albums?limit=50", true);
          request.setRequestHeader("Authorization", "Bearer "+ access_token);
          request.send();
 
-         request.onreadystatechange = function () {
-         if (request.readyState == 4 && request_.status == 200) {
-            var response = request.responseText;
-            var obj = JSON.parse(response); 
+         request.onload = function ()
+				{
+					// Begin accessing JSON data here
+					var data = this.response;
+					
+						
+					if (request.status >= 200 && request.status < 400)
+					{
+						var albums = JSON.parse(data);
+                        console.log(albums)
+
+                        for (i=0; i<51; i++)
+                        {
+                        
+                        
+
+                        
+                        var img = document.createElement("img");
+                        document.write("<img src=" + albums.items[i].album.images[1].url +" /><br>");
+                        document.write(albums.items[i].album.name + "<br>");
+                        
+                        console.log(albums.items[i].album.images[1].url)
+
+                        
+                        
+                        
+
+                        }
+                        
+
+					}else
+					  {
+						console.log('error');
+					  };
         }
+
     </script>
 </body>
 </html>
