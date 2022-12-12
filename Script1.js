@@ -28,27 +28,7 @@
                         
 
 					}
-
-                                        request.open("GET", "https://api.spotify.com/v1/me/playlists/4SVBKkABL4J6XZ9uPMqF3w", true);
-                                        request.setRequestHeader("Authorization", "Bearer "+ access_token);
-                                        request.send();
-                               
-                                        request.onload = function ()
-                                                               {
-                                                                       // Begin accessing JSON data here
-                                                                       var data = this.response;
-                                                                       
-                                                                               
-                                                                       if (request.status >= 200 && request.status < 400)
-                                                                       {
-                                                                               window.albums = JSON.parse(data);
-                                                       console.log(albums)
-                               
-                                                       var multiple =[];
-                                                       var artists =[];
-                                                       
-                               
-                                                                       }                               
+                                        
 
 
 
