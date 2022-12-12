@@ -40,11 +40,10 @@
                 xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                 console.log(xhr.status);
-                console.log(xhr.responseText);
+                console.log(xhr.response);
                 }};
 
-                var json = xhr.response;
-                console.log(json);
+                
                 xhr.send();
 
 
