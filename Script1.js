@@ -35,7 +35,7 @@
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url);
 
-                xhr.setRequestHeader("Authorization", "Bearer", access_token);
+                xhr.setRequestHeader("Authorization", "Bearer "+ access_token);
 
                 xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
