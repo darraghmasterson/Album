@@ -43,6 +43,8 @@
                 console.log(xhr.responseText);
                 }};
 
+                var json = xhr.response;
+                console.log(json);
                 xhr.send();
 
 
