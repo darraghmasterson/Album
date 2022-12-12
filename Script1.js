@@ -35,7 +35,7 @@
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url);
 
-                xhr.setRequestHeader("Authorization", "Bearer BQC_9NGr40F6D7l0ZQxhdUhQRVFxteOpSA3XTJwVb_PbmvHTual6lcjdtzAyrrM5YkRLRlXCT2z8_2ZQHGvNfnMdw4qLTL7HIFM-c2UxOnGxB-JPjqawHBZ1Cm7_YOMl4yYaH1nY0N8DtOgmU4AuI_6p3AIxwfXdhZT3COQM1Y9Qi1KWh6HpOXEaKTE");
+                xhr.setRequestHeader("Authorization", "Bearer", access_token);
 
                 xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
