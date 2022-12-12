@@ -20,7 +20,7 @@
 						
 					if (request.status >= 200 && request.status < 400)
 					{
-						window.value albums = JSON.parse(data);
+						window.albums = JSON.parse(data);
                         console.log(albums)
 
                         var multiple =[];
