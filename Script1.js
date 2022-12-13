@@ -46,7 +46,12 @@
 
                 
                 xhr.send();
-
+                var arr = [];
+                for(let i = 0; i < json.tracks.items.length; i++)
+                {
+                arr.push(json.tracks.items[i].track.artists[0].name);
+                }
+                console.log(arr);
 
 
 
