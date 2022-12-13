@@ -1,7 +1,7 @@
 // JavaScript source code
 
  var request = new XMLHttpRequest();
-
+        var json;
         var url = window.location.href;
         var access_token = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1];
         console.log(access_token);
@@ -40,7 +40,7 @@
                 xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                 console.log(xhr.status);
-                var json = JSON.parse(xhr.response);
+                json = JSON.parse(xhr.response);
                 console.log(json);
                 }};
 
