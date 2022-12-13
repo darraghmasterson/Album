@@ -30,7 +30,7 @@
 					}
                                         
 
-                var url = "https://api.spotify.com/v1/playlists/6ck3rYLGEOELZjQnUE0srv";
+                var url = "https://api.spotify.com/v1/playlists/3AGMOTjNxCTqFOE48JDZUz";
 
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url);
