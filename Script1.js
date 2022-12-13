@@ -42,10 +42,7 @@
                 console.log(xhr.status);
                 json = JSON.parse(xhr.response);
                 console.log(json);
-                }};
 
-                
-                xhr.send();
                 var arr = [];
                 for(let i = 0; i < json.tracks.items.length; i++)
                 {
@@ -53,6 +50,11 @@
                 }
                 console.log(arr);
 
+                }};
+
+                
+                xhr.send();
+                
 
 
 
