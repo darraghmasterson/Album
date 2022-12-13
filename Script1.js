@@ -30,7 +30,7 @@
 					}
                                         
 
-                var url = "https://api.spotify.com/v1/playlists/3AGMOTjNxCTqFOE48JDZUz";
+                var url = "https://api.spotify.com/v1/playlists/3AGMOTjNxCTqFOE48JDZUz/tracks?offset=0&limit=50";
 
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url);
@@ -43,13 +43,13 @@
                 json = JSON.parse(xhr.response);
                 console.log(json);
 
-                var arr = [];
+                /*var arr = [];
                 for(let i = 0; i < json.tracks.items.length; i++)
                 {
                 arr.push(json.tracks.items[i].track.artists[0].name);
                 }
                 console.log(arr);
-
+                                */
                 }};
 
                 
