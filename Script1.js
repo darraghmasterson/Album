@@ -30,18 +30,35 @@
 					}
                                         
 
-                var url = "https://api.spotify.com/v1/playlists/3AGMOTjNxCTqFOE48JDZUz/tracks?offset=0&limit=50";
-
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", url);
-
-                xhr.setRequestHeader("Authorization", `Bearer ${access_token}`);
-
-                xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                console.log(xhr.status);
-                json = JSON.parse(xhr.response);
-                console.log(json);
+                    var url = "https://api.spotify.com/v1/playlists/3AGMOTjNxCTqFOE48JDZUz/tracks";
+                    var offset = 0;
+                    var limit = 50;
+                    
+                    var xhr = new XMLHttpRequest();
+                    
+                    // Function to make API request
+                    function makeRequest() {
+                      xhr.open("GET", url + `?offset=${offset}&limit=${limit}`);
+                      xhr.setRequestHeader("Authorization", `Bearer ${access_token}`);
+                      xhr.onreadystatechange = function () {
+                        if (xhr.readyState === 4) {
+                          console.log(xhr.status);
+                          var json = JSON.parse(xhr.responseText);
+                          console.log(json);
+                    
+                          // Check if there are more results
+                          if (json.next) {
+                            // If there are more results, update the offset and make another request
+                            offset += limit;
+                            makeRequest();
+                          }
+                        }
+                      };
+                      xhr.send();
+                    }
+                    
+                    makeRequest();
+                    
 
                 /*var arr = [];
                 for(let i = 0; i < json.tracks.items.length; i++)
