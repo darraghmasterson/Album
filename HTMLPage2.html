@@ -43,33 +43,44 @@
     }
 
     // Function to make API request to get artists from selected playlist
-    function getPlaylistArtists() {
-      var playlistId = document.getElementById('playlistSelect').value;
-      if (!playlistId) return;
+    function getPlaylistArtists(playlistId) {
+  var artistsListElement = document.getElementById("artistsList");
+  artistsListElement.innerHTML = ""; // Clear existing list
 
-      $.ajax({
-        url: 'https://api.spotify.com/v1/playlists/' + playlistId + '/tracks',
-        headers: {
-          'Authorization': 'Bearer ' + accessToken
-        },
-        success: function(response) {
-          var tracks = response.items;
-          var artistsListElement = document.getElementById('artistsList');
-          artistsListElement.innerHTML = '';
-          tracks.forEach(function(track) {
-            var artists = track.track.artists.map(function(artist) {
-              return artist.name;
-            });
-            var listItemElement = document.createElement('li');
-            listItemElement.textContent = artists.join(', ');
-            artistsListElement.appendChild(listItemElement);
-          });
-        },
-        error: function(error) {
-          console.error('Failed to fetch playlist tracks:', error);
+  // Function to fetch playlist tracks from URL
+  function fetchPlaylistTracks(url) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url);
+    xhr.setRequestHeader("Authorization", "Bearer " + access_token);
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        var json = JSON.parse(xhr.responseText);
+        var items = json.items;
+        for (var i = 0; i < items.length; i++) {
+          var artists = items[i].track.artists;
+          for (var j = 0; j < artists.length; j++) {
+            var artistName = artists[j].name;
+            var listItem = document.createElement("li");
+            listItem.textContent = artistName;
+            artistsListElement.appendChild(listItem);
+          }
         }
-      });
-    }
+        var nextUrl = json.next;
+        if (nextUrl) {
+          fetchPlaylistTracks(nextUrl); // Fetch next page of tracks recursively
+        }
+      } else {
+        console.error("Failed to fetch playlist tracks: ", xhr.status);
+      }
+    };
+    xhr.send();
+  }
+
+  // Call fetchPlaylistTracks with initial URL
+  var initialUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
+  fetchPlaylistTracks(initialUrl);
+}
+
 
     // Fetch user playlists automatically when page loads
     window.onload = function() {
