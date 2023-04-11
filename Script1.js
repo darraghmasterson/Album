@@ -5,7 +5,7 @@ var accessToken = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1]; // Set your 
 function fetchPlaylists() {
   var xhr = new XMLHttpRequest();
   xhr.open("GET", "https://api.spotify.com/v1/me/playlists");
-  xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
+  xhr.setRequestHeader("Authorization", "Bearer " + access_token);
   xhr.onload = function () {
     if (xhr.status === 200) {
       var json = JSON.parse(xhr.responseText);
@@ -25,7 +25,7 @@ function fetchPlaylists() {
   xhr.send();
 }
 
-// Fetch playlist artists and display as a list
+// Fetch playlist artists and display as a list with counts
 function getPlaylistArtists() {
   var playlistId = document.getElementById("playlistSelect").value;
   if (playlistId) {
@@ -35,7 +35,7 @@ function getPlaylistArtists() {
     function fetchPlaylistTracks(url) {
       var xhr = new XMLHttpRequest();
       xhr.open("GET", url);
-      xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
+      xhr.setRequestHeader("Authorization", "Bearer " + access_token);
       xhr.onload = function () {
         if (xhr.status === 200) {
           var json = JSON.parse(xhr.responseText);
@@ -55,8 +55,14 @@ function getPlaylistArtists() {
           if (nextUrl) {
             fetchPlaylistTracks(nextUrl); // Fetch next page of tracks recursively
           } else {
-            // Render artists list
-            renderArtistsList(Object.keys(artistsData));
+            // Render artists as a list with counts
+            var artistsList = document.getElementById("artistsList");
+            artistsList.innerHTML = ""; // Clear existing list
+            for (var artist in artistsData) {
+              var li = document.createElement("li");
+              li.textContent = artist + " (" + artistsData[artist] + ")";
+              artistsList.appendChild(li);
+            }
           }
         } else {
           console.error("Failed to fetch playlist tracks: ", xhr.status);
@@ -70,17 +76,3 @@ function getPlaylistArtists() {
     fetchPlaylistTracks(initialUrl);
   }
 }
-
-// Render artists list
-function renderArtistsList(artists) {
-  var artistsList = document.getElementById("artistsList");
-  artistsList.innerHTML = ""; // Clear existing list
-  for (var i = 0; i < artists.length; i++) {
-    var listItem = document.createElement("li");
-    listItem.textContent = artists[i];
-    artistsList.appendChild(listItem);
-  }
-}
-
-// Fetch playlists and populate dropdown menu
-fetchPlaylists();
