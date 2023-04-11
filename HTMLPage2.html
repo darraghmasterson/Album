@@ -6,7 +6,6 @@
 </head>
 <body>
   <h1>Spotify Web API Example</h1>
-  <button onclick="getUserPlaylists()">Get User Playlists</button>
   <select id="playlistSelect" onchange="getPlaylistArtists()">
     <option value="">Select Playlist</option>
   </select>
@@ -58,9 +57,11 @@
           var artistsListElement = document.getElementById('artistsList');
           artistsListElement.innerHTML = '';
           tracks.forEach(function(track) {
-            var artist = track.track.artists[0].name;
+            var artists = track.track.artists.map(function(artist) {
+              return artist.name;
+            });
             var listItemElement = document.createElement('li');
-            listItemElement.textContent = artist;
+            listItemElement.textContent = artists.join(', ');
             artistsListElement.appendChild(listItemElement);
           });
         },
@@ -69,6 +70,11 @@
         }
       });
     }
+
+    // Fetch user playlists automatically when page loads
+    window.onload = function() {
+      getUserPlaylists();
+    };
   </script>
 </body>
 </html>
