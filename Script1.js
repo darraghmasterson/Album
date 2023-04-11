@@ -1,100 +1,86 @@
-// JavaScript source code
+var url = window.location.href;
+var accessToken = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1]; // Set your Spotify API access token here
 
- var request = new XMLHttpRequest();
-        var json;
-        var url = window.location.href;
-        var access_token = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1];
-        console.log(access_token);
-        
+// Fetch user's playlists using Spotify Web API
+function fetchPlaylists() {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "https://api.spotify.com/v1/me/playlists");
+  xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      var json = JSON.parse(xhr.responseText);
+      var playlists = json.items;
+      var playlistSelect = document.getElementById("playlistSelect");
+      playlistSelect.innerHTML = "<option value=''>--Select Playlist--</option>"; // Clear existing options
+      for (var i = 0; i < playlists.length; i++) {
+        var option = document.createElement("option");
+        option.value = playlists[i].id;
+        option.text = playlists[i].name;
+        playlistSelect.add(option);
+      }
+    } else {
+      console.error("Failed to fetch playlists: ", xhr.status);
+    }
+  };
+  xhr.send();
+}
 
+// Fetch playlist artists and display as a list
+function getPlaylistArtists() {
+  var playlistId = document.getElementById("playlistSelect").value;
+  if (playlistId) {
+    var artistsData = {}; // Object to store artist names and their counts
 
-         request.open("GET", "https://api.spotify.com/v1/me/playlists?limit=50&offset=0", true);
-         request.setRequestHeader("Authorization", "Bearer "+ access_token);
-         request.send();
+    // Function to fetch playlist tracks from URL
+    function fetchPlaylistTracks(url) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", url);
+      xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          var json = JSON.parse(xhr.responseText);
+          var items = json.items;
+          for (var i = 0; i < items.length; i++) {
+            var artists = items[i].track.artists;
+            for (var j = 0; j < artists.length; j++) {
+              var artistName = artists[j].name;
+              if (artistsData[artistName]) {
+                artistsData[artistName]++; // Increment count if artist already exists
+              } else {
+                artistsData[artistName] = 1; // Add artist with count 1 if doesn't exist
+              }
+            }
+          }
+          var nextUrl = json.next;
+          if (nextUrl) {
+            fetchPlaylistTracks(nextUrl); // Fetch next page of tracks recursively
+          } else {
+            // Render artists list
+            renderArtistsList(Object.keys(artistsData));
+          }
+        } else {
+          console.error("Failed to fetch playlist tracks: ", xhr.status);
+        }
+      };
+      xhr.send();
+    }
 
-         request.onload = function ()
-				{
-					// Begin accessing JSON data here
-					var data = this.response;
-					
-						
-					if (request.status >= 200 && request.status < 400)
-					{
-						window.albums = JSON.parse(data);
-                        console.log(albums)
+    // Call fetchPlaylistTracks with initial URL
+    var initialUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
+    fetchPlaylistTracks(initialUrl);
+  }
+}
 
-                        var multiple =[];
-                        var artists =[];
-                        
+// Render artists list
+function renderArtistsList(artists) {
+  var artistsList = document.getElementById("artistsList");
+  artistsList.innerHTML = ""; // Clear existing list
+  for (var i = 0; i < artists.length; i++) {
+    var listItem = document.createElement("li");
+    listItem.textContent = artists[i];
+    artistsList.appendChild(listItem);
+  }
+}
 
-					}
-                                        
-
-                    var url = "https://api.spotify.com/v1/playlists/3AGMOTjNxCTqFOE48JDZUz/tracks";
-                    var offset = 0;
-                    var limit = 50;
-                    var allResults = []; // Array to store all results
-                    var artists = []; // Array to store artist names
-
-                    var xhr = new XMLHttpRequest();
-
-                    // Function to make API request
-                    function makeRequest() {
-                    xhr.open("GET", url + `?offset=${offset}&limit=${limit}`);
-                    xhr.setRequestHeader("Authorization", `Bearer ${access_token}`);
-                    xhr.onreadystatechange = function () {
-                        if (xhr.readyState === 4) {
-                        if (xhr.status === 200) {
-                            var json = JSON.parse(xhr.responseText);
-                            console.log(json);
-
-                            // Concatenate results to the allResults array
-                            allResults = allResults.concat(json.items);
-
-                            // Extract and store artist names in the artists array
-                            json.items.forEach(function(item) {
-                            artists.push(item.track.artists[0].name);
-                            });
-
-                            // Check if there are more results
-                            if (json.next) {
-                            // If there are more results, update the offset and make another request
-                            offset += limit;
-                            makeRequest();
-                            } else {
-                            console.log(allResults); // All results stored in one array
-                            console.log(artists); // Artist names stored in artists array
-                            }
-                        } else {
-                            console.error("Failed to fetch data from Spotify API: ", xhr.status);
-                        }
-                        }
-                    };
-                    xhr.send();
-                    }
-
-                    // Start the initial API request
-                    makeRequest();
-
-                    
-
-                };
-
-                
-                xhr.send();
-                
-
-
-
-                    
-                       
-                        
-                        
-                        
-
-                        
-                    
-                    
-
-                    
-                      
+// Fetch playlists and populate dropdown menu
+fetchPlaylists();
