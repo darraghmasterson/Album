@@ -15,12 +15,10 @@
   </div>
   <script>
     var url = window.location.href;
-    var accessToken = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1];
-    var access_token = ""; // Set your Spotify API access token here
+    var accessToken = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1]; // Set your Spotify API access token here
 
     // Fetch user's playlists using Spotify Web API
     function fetchPlaylists() {
-        
       var xhr = new XMLHttpRequest();
       xhr.open("GET", "https://api.spotify.com/v1/me/playlists");
       xhr.setRequestHeader("Authorization", "Bearer " + access_token);
@@ -84,4 +82,9 @@
         }
 
         // Call fetchPlaylistTracks with initial URL
-        var initialUrl = "https://api.spotify.com/v1/playlists/" + playlist
+        var initialUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
+        fetchPlaylistTracks(initialUrl);
+      }
+    }
+
+    // Render
