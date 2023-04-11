@@ -34,6 +34,7 @@
                     var offset = 0;
                     var limit = 50;
                     var allResults = []; // Array to store all results
+                    var artists = []; // Array to store artist names
 
                     var xhr = new XMLHttpRequest();
 
@@ -50,6 +51,11 @@
                             // Concatenate results to the allResults array
                             allResults = allResults.concat(json.items);
 
+                            // Extract and store artist names in the artists array
+                            json.items.forEach(function(item) {
+                            artists.push(item.track.artists[0].name);
+                            });
+
                             // Check if there are more results
                             if (json.next) {
                             // If there are more results, update the offset and make another request
@@ -57,6 +63,7 @@
                             makeRequest();
                             } else {
                             console.log(allResults); // All results stored in one array
+                            console.log(artists); // Artist names stored in artists array
                             }
                         } else {
                             console.error("Failed to fetch data from Spotify API: ", xhr.status);
