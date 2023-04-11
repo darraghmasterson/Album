@@ -67,7 +67,7 @@
                 }
                 console.log(arr);
                                 */
-                }};
+                };
 
                 
                 xhr.send();
