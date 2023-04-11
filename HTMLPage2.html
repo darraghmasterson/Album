@@ -1,91 +1,93 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>Spotify Web API Example</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <title>Playlist Artists</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h1>Spotify Web API Example</h1>
-  <select id="playlistSelect" onchange="getPlaylistArtists()">
-    <option value="">Select Playlist</option>
-  </select>
-  <ul id="artistsList"></ul>
-
+  <h1>Playlist Artists</h1>
+  <h2>Enter Playlist ID:</h2>
+  <input type="text" id="playlistIdInput">
+  <button onclick="getPlaylistArtists()">Get Artists</button>
+  <div id="chartContainer" style="max-width: 600px; margin-top: 20px;">
+    <canvas id="artistsChart"></canvas>
+  </div>
   <script>
-    // Replace with your own values
     var url = window.location.href;
-    var clientId = '64c780bd6ac34575b9f2d569a53096fe';
-    var redirectUri = 'https://darraghmasterson.github.io/Album/HTMLPage2.html';
-    var accessToken = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1];
+    var accessToken = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1]; // Set your Spotify API access token here
 
-    // Function to make API request to get user playlists
-    function getUserPlaylists() {
-      $.ajax({
-        url: 'https://api.spotify.com/v1/me/playlists',
-        headers: {
-          'Authorization': 'Bearer ' + accessToken
+    function getPlaylistArtists() {
+      var playlistId = document.getElementById("playlistIdInput").value;
+      var artistsListElement = document.getElementById("artistsList");
+      artistsListElement.innerHTML = ""; // Clear existing list
+
+      var artistsData = {}; // Object to store artist names and their counts
+
+      // Function to fetch playlist tracks from URL
+      function fetchPlaylistTracks(url) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.setRequestHeader("Authorization", "Bearer " + access_token);
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            var json = JSON.parse(xhr.responseText);
+            var items = json.items;
+            for (var i = 0; i < items.length; i++) {
+              var artists = items[i].track.artists;
+              for (var j = 0; j < artists.length; j++) {
+                var artistName = artists[j].name;
+                if (artistsData[artistName]) {
+                  artistsData[artistName]++; // Increment count if artist already exists
+                } else {
+                  artistsData[artistName] = 1; // Add artist with count 1 if doesn't exist
+                }
+              }
+            }
+            var nextUrl = json.next;
+            if (nextUrl) {
+              fetchPlaylistTracks(nextUrl); // Fetch next page of tracks recursively
+            } else {
+              // Render chart when all tracks fetched
+              renderChart(Object.keys(artistsData), Object.values(artistsData));
+            }
+          } else {
+            console.error("Failed to fetch playlist tracks: ", xhr.status);
+          }
+        };
+        xhr.send();
+      }
+
+      // Call fetchPlaylistTracks with initial URL
+      var initialUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
+      fetchPlaylistTracks(initialUrl);
+    }
+
+    // Function to render bar chart
+    function renderChart(labels, data) {
+      var ctx = document.getElementById("artistsChart").getContext("2d");
+      var chart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Artist Counts",
+            data: data,
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            borderColor: "rgba(75, 192, 192, 1)",
+            borderWidth: 1
+          }]
         },
-        success: function(response) {
-          var playlists = response.items;
-          var selectElement = document.getElementById('playlistSelect');
-          selectElement.innerHTML = '<option value="">Select Playlist</option>';
-          playlists.forEach(function(playlist) {
-            var optionElement = document.createElement('option');
-            optionElement.value = playlist.id;
-            optionElement.textContent = playlist.name;
-            selectElement.appendChild(optionElement);
-          });
-        },
-        error: function(error) {
-          console.error('Failed to fetch playlists:', error);
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              stepSize: 1
+            }
+          }
         }
       });
     }
-
-    // Function to make API request to get artists from selected playlist
-    function getPlaylistArtists(playlistId) {
-  var artistsListElement = document.getElementById("artistsList");
-  artistsListElement.innerHTML = ""; // Clear existing list
-
-  // Function to fetch playlist tracks from URL
-  function fetchPlaylistTracks(url) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url);
-    xhr.setRequestHeader("Authorization", "Bearer " + access_token);
-    xhr.onload = function () {
-      if (xhr.status === 200) {
-        var json = JSON.parse(xhr.responseText);
-        var items = json.items;
-        for (var i = 0; i < items.length; i++) {
-          var artists = items[i].track.artists;
-          for (var j = 0; j < artists.length; j++) {
-            var artistName = artists[j].name;
-            var listItem = document.createElement("li");
-            listItem.textContent = artistName;
-            artistsListElement.appendChild(listItem);
-          }
-        }
-        var nextUrl = json.next;
-        if (nextUrl) {
-          fetchPlaylistTracks(nextUrl); // Fetch next page of tracks recursively
-        }
-      } else {
-        console.error("Failed to fetch playlist tracks: ", xhr.status);
-      }
-    };
-    xhr.send();
-  }
-
-  // Call fetchPlaylistTracks with initial URL
-  var initialUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
-  fetchPlaylistTracks(initialUrl);
-}
-
-
-    // Fetch user playlists automatically when page loads
-    window.onload = function() {
-      getUserPlaylists();
-    };
   </script>
 </body>
 </html>
