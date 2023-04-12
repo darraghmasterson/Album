@@ -65,6 +65,7 @@
         }
       };
       xhr.send();
+      console.log(artists);
     }
 
     // Fetch next page of artists
@@ -103,7 +104,6 @@
         artistItem.textContent = artists[i];
         artistList.appendChild(artistItem);
       }
-      console.log(artistList);
     }
 
     // Add event listener to playlist select element
