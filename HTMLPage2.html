@@ -15,6 +15,7 @@
     var url = window.location.href;
     var access_token = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1]; // Set your Spotify API access token here
 
+    var artists = []; // Array to store artists
 
     // Fetch user's playlists using Spotify Web API
     function fetchPlaylists() {
@@ -40,72 +41,77 @@
       xhr.send();
     }
 
-   // Fetch and display primary artists when playlist is selected
-function fetchArtists() {
-  var playlistId = document.getElementById("playlistSelect").value;
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks?fields=items(track(artists[0](name))),next");
-  xhr.setRequestHeader("Authorization", "Bearer " + access_token);
-  xhr.onload = function () {
-    if (xhr.status === 200) {
-      var json = JSON.parse(xhr.responseText);
-      var tracks = json.items;
-      var artistList = document.getElementById("artistList");
-      artistList.innerHTML = ""; // Clear existing artists
-      for (var i = 0; i < tracks.length; i++) {
-        var artistName = tracks[i].track.artists[0].name; // Get the first artist as primary
-        var listItem = document.createElement("li");
-        listItem.textContent = artistName;
-        artistList.appendChild(listItem);
-      }
-      if (json.next) {
-        // If there are more tracks, fetch the next page of results
-        fetchNextArtists(json.next);
-      }
-    } else {
-      console.error("Failed to fetch artists: ", xhr.status);
+    // Fetch and store primary artists when playlist is selected
+    function fetchArtists() {
+      var playlistId = document.getElementById("playlistSelect").value;
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks?fields=items(track(artists[0](name))),next");
+      xhr.setRequestHeader("Authorization", "Bearer " + access_token);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          var json = JSON.parse(xhr.responseText);
+          var tracks = json.items;
+          artists = []; // Clear existing artists in the array
+          for (var i = 0; i < tracks.length; i++) {
+            var artistName = tracks[i].track.artists[0].name; // Get the first artist as primary
+            artists.push(artistName); // Add artist to the array
+          }
+          if (json.next) {
+            // If there are more tracks, fetch the next page of results
+            fetchNextArtists(json.next);
+          }
+        } else {
+          console.error("Failed to fetch artists: ", xhr.status);
+        }
+      };
+      xhr.send();
     }
-  };
-  xhr.send();
-}
 
-// Fetch next page of artists
-function fetchNextArtists(url) {
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", url);
-  xhr.setRequestHeader("Authorization", "Bearer " + access_token);
-  xhr.onload = function () {
-    if (xhr.status === 200) {
-      var json = JSON.parse(xhr.responseText);
-      var tracks = json.items;
-      var artistList = document.getElementById("artistList");
-      for (var i = 0; i < tracks.length; i++) {
-        var artistName = tracks[i].track.artists[0].name; // Get the first artist as primary
-        var listItem = document.createElement("li");
-        listItem.textContent = artistName;
-        artistList.appendChild(listItem);
-      }
-      if (json.next) {
-        // If there are more tracks, fetch the next page of results
-        fetchNextArtists(json.next);
-      }
-    } else {
-      console.error("Failed to fetch artists: ", xhr.status);
+    // Fetch next page of artists
+    function fetchNextArtists(url) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", url);
+      xhr.setRequestHeader("Authorization", "Bearer " + access_token);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          var json = JSON.parse(xhr.responseText);
+          var tracks = json.items;
+          for (var i = 0; i < tracks.length; i++) {
+            var artistName = tracks[i].track.artists[0].name; // Get the first artist as primary
+            artists.push(artistName); // Add artist to the array
+          }
+          if (json.next) {
+            //            // If there are more tracks, fetch the next page of results
+            fetchNextArtists(json.next);
+          } else {
+            // Once all artists are fetched, populate the artist list
+            populateArtistList();
+          }
+        } else {
+          console.error("Failed to fetch artists: ", xhr.status);
+        }
+      };
+      xhr.send();
     }
-  };
-  xhr.send();
-}
 
+    // Populate the artist list on the DOM
+    function populateArtistList() {
+      var artistList = document.getElementById("artistList");
+      artistList.innerHTML = ""; // Clear existing artists in the DOM
+      for (var i = 0; i < artists.length; i++) {
+        var artistItem = document.createElement("li");
+        artistItem.textContent = artists[i];
+        artistList.appendChild(artistItem);
+      }
+    }
 
-    // Call fetchPlaylists() to populate the dropdown menu on page load
-    window.onload = function () {
-      fetchPlaylists();
-    };
-
-    // Add event listener to playlist dropdown menu
+    // Add event listener to playlist select element
     document.getElementById("playlistSelect").addEventListener("change", function () {
       fetchArtists();
     });
+
+    // Fetch and populate playlists when the page loads
+    fetchPlaylists();
   </script>
 </body>
 </html>
